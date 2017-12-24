@@ -1,7 +1,19 @@
 #!/usr/bin/python
 
+import numpy as np
 import csv
-import time
+# import time
+
+import matplotlib.pyplot as plt
+
+def showPlot(X, Y, th0, th1):
+	plt.plot(X, Y, 'ro')
+	max1 = np.amax(np.array(X).astype(np.float))
+	res = th0 + (max1 * th1)
+	plt.plot([0, max1], [th0, res])
+	plt.ylabel('Price')
+	plt.xlabel('Mileage')
+	plt.show()
 
 def estimatePrice(mileage):
 	ret = th0 + (th1 * mileage)
@@ -102,5 +114,7 @@ while True:
 
 		oldth0 = th0
 		oldth1 = th1
+
+showPlot(X, Y, th0, th1)
 
 	# time.sleep(0.01)
