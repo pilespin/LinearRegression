@@ -6,13 +6,23 @@ import csv
 
 import matplotlib.pyplot as plt
 
-def showPlot(X, Y, th0, th1):
-	plt.plot(X, Y, 'ro')
+def showPlot(th0, th1):
+
+	font = {'family': 'serif',
+        'color':  'darkred',
+        'weight': 'normal',
+        'size': 16,
+        }
+
+	plt.title(r'$\theta$0 = ' + str(th0) + "		" + r'$\theta$1 = ' + str(th1), fontdict=font)
 	max1 = np.amax(np.array(X).astype(np.float))
 	res = th0 + (max1 * th1)
+
+	plt.plot(X, Y, 'mo')
 	plt.plot([0, max1], [th0, res])
 	plt.ylabel('Price')
 	plt.xlabel('Mileage')
+
 	plt.show()
 
 def estimatePrice(mileage):
@@ -44,10 +54,13 @@ def updateLr(th, loss, lr):
 		th = th + lr
 	return th
 
-def printScores(th0, th1, tmpTh0, tmpTh1):
-	lossTh0 = str(abs(tmpTh0))
-	lossTh1 = str(abs(tmpTh1))
-	print "Th0: " + str(th0) + "	Th1: " + str(th1) + "	Loss Th0: " + str(lossTh0) + "	Th1: " + str(lossTh1) + "	Epoch: " + str(epoch)
+def printScores(th0, th1, tmpTh0, tmpTh1, epoch):	
+	lossTh0 = round(abs(tmpTh0), 5)
+	lossTh1 = round(abs(tmpTh1), 5)
+
+	print("Th0: {0:<15.5g} Th1: {1:<15.5g} Loss Th0: {2:<15.5g} Th1: {3:<15.5g} Epoch: {4:}" \
+		.format(th0, th1, lossTh0, lossTh1, epoch))
+
 	with open('theta', 'w') as file:
 		file.write(str(th0) + "," + str(th1) + "\n")
 
@@ -79,42 +92,50 @@ th0 = 0 	# 8498
 th1 = 0		# -0.02142
 lr0 = 1.0
 lr1 = 1.0
-PRECISION = 1e-07
-
-# print "ESTIMATED " + str(estimatePrice(10000))
-
+PRECISION = 1e-07 # Learning rate minimal.
 X, Y = csvToArray("data.csv")
 m = len(X)
 
-epoch = 0
-oldth0 = 0
-oldth1 = 0
-while True:
-	epoch+=1
+def main():
 
-	tmpTh0 = lr0 * sigmaTh0() / m
-	tmpTh1 = lr1 * sigmaTh1() / m
+	# print "ESTIMATED " + str(estimatePrice(10000))
 
-	th0 = updateLr(th0, tmpTh0, lr0)
-	th1 = updateLr(th1, tmpTh1, lr1)
-	
-	if epoch % 50 == 0:
-		if oldth0 >= th0 and oldth1 >= th1:
-			if lr1 > PRECISION:
-				lr1 = lr1 / 10
-				# print " --- LEARNING RATE Th1 SET TO " + str(lr1) 
-			elif lr0 > PRECISION:
-				lr0 = lr0 / 10
-				# print " --- LEARNING RATE Th0 SET TO " + str(lr0)
-			else:
-				printScores(th0, th1, tmpTh0, tmpTh1)
-				break
-		if epoch % 3000 == 0:
-			printScores(th0, th1, tmpTh0, tmpTh1)
+	global lr0
+	global lr1
+	global th0
+	global th1
 
-		oldth0 = th0
-		oldth1 = th1
+	epoch = 0
+	oldth0 = 0
+	oldth1 = 0
+	while True:
+		epoch+=1
 
-showPlot(X, Y, th0, th1)
+		tmpTh0 = lr0 * sigmaTh0() / m
+		tmpTh1 = lr1 * sigmaTh1() / m
+
+		th0 = updateLr(th0, tmpTh0, lr0)
+		th1 = updateLr(th1, tmpTh1, lr1)
+		
+		if epoch % 50 == 0:
+			if oldth0 >= th0 and oldth1 >= th1:
+				if lr1 > PRECISION:
+					lr1 = lr1 / 10
+					# print " --- LEARNING RATE Th1 SET TO " + str(lr1) 
+				elif lr0 > PRECISION:
+					lr0 = lr0 / 10
+					# print " --- LEARNING RATE Th0 SET TO " + str(lr0)
+				else:
+					printScores(th0, th1, tmpTh0, tmpTh1, epoch)
+					break
+			if epoch % 3000 == 0:
+				printScores(th0, th1, tmpTh0, tmpTh1, epoch)
+
+			oldth0 = th0
+			oldth1 = th1
+
+	showPlot(th0, th1)
 
 	# time.sleep(0.01)
+
+main()

@@ -31,13 +31,16 @@ th0, th1 = csvToArray("theta")
 
 while True:
 	try:
-		mileage = raw_input("Enter a mileage: ")
 		try:
-			mileage = float(mileage)
-			price = estimatePrice(th0, th1, mileage)
-			if price < 0:
-				price = 0
-			print "Price: " + str(price)
+			mileage = raw_input("Enter a mileage: ")
+			if float(mileage) < 0:
+				print "Bad mileage"
+			else:
+					mileage = float(mileage)
+					price = estimatePrice(th0, th1, mileage)
+					if price < 0:
+						price = 0
+					print "Price: " + str(price)
 		except ValueError:
 			print "Bad mileage"
 	except EOFError:
